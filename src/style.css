@@ -29,3 +29,24 @@ html,body{
   overflow-y: auto;
   width: 100%;
 }
+
+.error{
+  color: red;
+}
+
+.flex-container-row{
+  display: flex;
+}
+
+.flex{
+  flex: 1;
+}
+
+.full-size{
+  width: 100vw;
+  height: 100vh;
+}
+
+.p-datatable-small td{
+  padding: 0.2rem;
+}

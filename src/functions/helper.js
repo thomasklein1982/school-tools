@@ -47,6 +47,10 @@ async function uploadExcelSheet(file, sheet){
   let p=new Promise((resolve,reject)=>{
     readExcelFile(file, {sheet}).then((rows)=>{
       resolve(rows);
+    }).catch((e)=>{
+      resolve({
+        error: e
+      });
     });
   });
   let rows=await p;
@@ -74,11 +78,16 @@ export async function uploadExcel(options){
 }
 
 async function uploadExcelFile(file){
-  let p=new Promise((resolve,reject)=>{
+  let p=new Promise(async (resolve,reject)=>{
     readSheetNames(file).then(async (sheetnames)=>{
       let excel=[];
       for(let i=0;i<sheetnames.length;i++){
         let rows=await uploadExcelSheet(file, sheetnames[i]);
+        if(rows.error){
+          rows.name=sheetnames[i];
+          resolve(rows);
+          return;
+        }
         excel.push({
           name: sheetnames[i],
           rows: rows
