@@ -1,11 +1,22 @@
 <template>
-  <Dialog maximizable v-if="klasse" v-model:visible="visible" :header="klasse.name+' ('+klasse.klassenlehrkraft+')'">
+  <Dialog modal maximizable v-if="klasse" v-model:visible="visible" :header="klasse.name+' ('+klasse.klassenlehrkraft+')'">
     <div class="flex-container-row">
       <template v-for="(liste,i) in schuelerlisten">
-        <DataTable class="flex p-datatable-small" :value="liste" striped-rows>
-          <Column field="anzeigeName" header="Name"/>
-          
+        <DataTable show-gridlines selectionMode="single" dataKey="id" :metaKeySelection="false"
+        @rowSelect="onRowSelect" class="flex p-datatable-small" :value="liste" striped-rows>
+          <Column header="Name">
+            <template #body="schueler">
+              <span :class="schueler.data.zeigeWarnung? 'warnung-note':''">{{ schueler.data.anzeigeName }}</span>
+            </template>
+          </Column>
+          <Column v-for="(f,i) in angezeigteFaecher" :header="f" style="text-align: center">
+            <template #body="schueler">
+              {{ schueler.data.getNote(f).join("|") }}
+            </template>
+          </Column>
+          <Column v-if="zeigeSchnitt" field="schnitt" header="⌀"/>
         </DataTable>
+        <div v-if="i<schuelerlisten.length-1" style="width: 0.5rem"></div>
       </template>
     </div>
     <div>
@@ -13,35 +24,47 @@
       <Dropdown v-model="columns" :options="[{text: '1 Spalte', value: 1}, {text: '2 Spalten', value: 2}, {text: '3 Spalten', value: 3}, {text: '4 Spalten', value: 4}]" optionLabel="text" optionValue="value"/>
     </div>
   </Dialog>
+  <DialogSchuelerSchnitt ref="dialogSchuelerSchnitt"/>
 </template>
 
 <script>
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
+import DialogSchuelerSchnitt from "./DialogSchuelerSchnitt.vue";
+import { splitArrayEvenly } from "../functions/helper";
 export default{
   components: {
-    DataTable, Column
+    DataTable, Column, DialogSchuelerSchnitt
   },
   props: {
     
   },
   computed: {
-    schuelerlisten(){
-      let listen=[];
-      let anzahl=Math.ceil(this.klasse.size()/this.columns);
-      let offset=0;
-      for(let i=0;i<this.columns;i++){
-        let liste=[];
-        if(i===this.columns-1){
-          anzahl=this.klasse.size()-(this.columns-1)*anzahl;
-        }
-        for(let j=0;j<anzahl;j++){
-          liste.push(this.klasse.getSchueler(offset));
-          offset++;
-        }
-        listen.push(liste);
+    zeigeSchnitt(){
+      return this.anzeigeFaecher===0;
+    },
+    angezeigteFaecher(){
+      if(this.anzeigeFaecher===0){
+        return [];
       }
+      if(this.anzeigeFaecher===1){
+        return ["AV","SV"];
+      }
+      if(this.anzeigeFaecher===2){
+        let faecher=this.klasse.getPflichtFaecher(false);
+        for(let i=0;i<faecher.length;i++){
+          faecher[i]=faecher[i].name;
+        }
+        return faecher;
+      }
+      return [this.anzeigeFaecher];
+    },
+    schuelerlisten(){
+      let listen=splitArrayEvenly(this.klasse.schueler,this.columns);
       return listen;
+    },
+    notenHeader(){
+
     }
   },
   data(){
@@ -53,20 +76,37 @@ export default{
       optionsFaecher: []
     }
   },
+  emits: ["schueler"],
   methods: {
+    onRowSelect(schueler){
+      this.$emit("schueler",schueler.data);
+    },
     open(klasse){
       this.klasse=klasse;
       while(this.optionsFaecher.length>0){
-        this.optionsfaecher.pop();
+        this.optionsFaecher.pop();
       }
       this.optionsFaecher.push({
-        text: "Keine Noten",
+        text: "Durchschnitt",
         value: 0
       });
-      this.optionsFaecher.push({
-        text: "Alle Noten",
-        value: 1
-      });
+      if(!this.klasse.oberstufe){
+        this.optionsFaecher.push({
+          text: "Kopfnoten",
+          value: 1
+        });
+        this.optionsFaecher.push({
+          text: "Alle Noten",
+          value: 2
+        });
+      }
+      let faecher=this.klasse.getPflichtFaecher(false);
+      for(let i=0;i<faecher.length;i++){
+        this.optionsFaecher.push({
+          text: faecher[i].name,
+          value: faecher[i].name
+        });
+      }
       this.visible=true;
     }
   }

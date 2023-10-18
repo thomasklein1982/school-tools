@@ -1,7 +1,7 @@
 import { createApp } from 'vue'
-import './style.css'
-import 'primevue/resources/themes/vela-orange/theme.css';
 import 'primevue/resources/primevue.min.css';
+import 'primevue/resources/themes/vela-orange/theme.css';
+import './style.css'
 import 'primeicons/primeicons.css';
 import  * as PrimeVue  from "primevue/config";
 import  Button from "primevue/button";

@@ -1,14 +1,18 @@
 <template>
-  <Startscreen
-    v-if="current==='start'"
-    :version="version"
-    @conference="current='conference'"
-    @mahnliste="current='mahnliste'"
-  />
-  <ConferenceTool 
-    v-if="current==='conference'"
-    
-  />
+  <Card class="screen">
+    <template #content>
+      <Startscreen
+        v-if="current==='start'"
+        :version="version"
+        @conference="current='conference'"
+        @mahnliste="current='mahnliste'"
+      />
+      <ConferenceTool 
+        v-if="current==='conference'"
+        
+      />
+    </template>
+  </Card>
 </template>
 
 <script>
@@ -18,7 +22,7 @@ import ConferenceTool from './components/Conference-Tool.vue';
 export default {
   data(){
     return {
-      version: "0.1",
+      version: "1.0",
       current: 'start'
     }
   },

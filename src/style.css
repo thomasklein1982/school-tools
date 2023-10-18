@@ -22,6 +22,7 @@ html,body{
   width: 100%;
   display: flex;
   flex-direction: column;
+  overflow: auto;
 }
 
 .content{
@@ -29,9 +30,26 @@ html,body{
   overflow-y: auto;
   width: 100%;
 }
-
+.warnung-note{
+  color: red;
+}
+.warnung-note::after{
+  display: inline-block;
+  width: 1rem;
+  text-align: center;
+  content: "!";
+  border: 1.5pt solid red;
+  font-size: 80%;
+  font-weight: bold;
+  border-radius: 100%;
+  margin-left: 0.2rem;
+}
 .error{
   color: red;
+}
+
+.p-card .p-card-content{
+  padding: 0;
 }
 
 .flex-container-row{
@@ -47,6 +65,10 @@ html,body{
   height: 100vh;
 }
 
-.p-datatable-small td{
+.p-datatable-small td,.p-datatable-small th{
   padding: 0.2rem;
+}
+
+.p-datatable .p-column-header-content{
+  display: block;
 }

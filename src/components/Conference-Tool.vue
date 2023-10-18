@@ -2,6 +2,7 @@
   <div class="screen">
     <div class="content">
       <template v-if="klassen">
+        <div class="flex-container-row" style="justify-content: flex-end"><Button @click="klassen=null" icon="pi pi-trash" text rounded/></div>
         <Klassenliste
           :klassen="klassen"
         />
@@ -10,6 +11,7 @@
         Laden Sie bitte zunächst die exportierten Schüler-Daten (Excel) hoch:
         <div>
           <Button @click="upload" label="Hochladen" icon="pi pi-upload" :loading="uploadInProgress"/>
+          <Button @click="cancelUpload()" v-if="uploadInProgress" label="Hochladen abbrechen" icon="pi pi-cross"/>
         </div>
         <div v-if="excelError" class="error">
           {{ excelError }}
@@ -37,6 +39,10 @@ import Klassenliste from './Klassenliste.vue';
       };
     },
     methods: {
+      cancelUpload(){
+        this.uploadInProgress=false;
+        this.klassen=null;
+      },
       async upload(){
         this.uploadInProgress=true;
         this.excelError=null;
@@ -47,6 +53,10 @@ import Klassenliste from './Klassenliste.vue';
           }
           this.klassen=[];
           for(let i=0;i<rawData.length;i++){
+            if(!this.uploadInProgress){
+              this.cancelUpload();
+              return;
+            }
             let data=rawData[i];
             let klasse=new Klasse();
             klasse.parseFromExcel(data);
@@ -54,6 +64,7 @@ import Klassenliste from './Klassenliste.vue';
           }
         }catch(e){
           this.excelError=e;
+          this.klassen=null;
         }
         this.uploadInProgress=false;
         

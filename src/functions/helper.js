@@ -71,6 +71,10 @@ export async function uploadExcel(options){
       document.body.removeChild(fi);
       resolve(excel);
     },false);
+    fi.addEventListener("blur",(e)=>{
+      console.log("cancel");
+      resolve(null);
+    });
     fi.click();
   });
   var q=await p;
@@ -169,4 +173,22 @@ export async function loadLocally(key){
     data=JSON.parse(c);
   }
   return data;
+}
+
+export function splitArrayEvenly(array,arrayCount){
+  let listen=[];
+  let anzahl=Math.ceil(array.length/arrayCount);
+  let offset=0;
+  for(let i=0;i<arrayCount;i++){
+    let liste=[];
+    if(i===arrayCount-1){
+      anzahl=array.length-(arrayCount-1)*anzahl;
+    }
+    for(let j=0;j<anzahl;j++){
+      liste.push(array[offset]);
+      offset++;
+    }
+    listen.push(liste);
+  }
+  return listen;
 }
