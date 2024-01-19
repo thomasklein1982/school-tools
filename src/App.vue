@@ -9,7 +9,7 @@
       />
       <ConferenceTool 
         v-if="current==='conference'"
-        
+        @close="current='start'"
       />
     </template>
   </Card>
@@ -22,7 +22,7 @@ import ConferenceTool from './components/Conference-Tool.vue';
 export default {
   data(){
     return {
-      version: "1.0",
+      version: "1.1",
       current: 'start'
     }
   },

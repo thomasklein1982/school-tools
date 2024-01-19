@@ -54,6 +54,7 @@ html,body{
 
 .flex-container-row{
   display: flex;
+  overflow: hidden;
 }
 
 .flex{

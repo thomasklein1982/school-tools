@@ -38,6 +38,15 @@ export default class Schueler{
     }
     return note;
   }
+  getRealNote(fachname){
+    for(let i=0;i<this.faecher.length;i++){
+      let f=this.faecher[i];
+      if(f.name===fachname && f.hasNote()){
+        return f.getRealNote();
+      }
+    }
+    return -1;
+  }
   getBelegteFaecher(includeKopfnoten){
     let faecher=[];
     for(let i=0;i<this.faecher.length;i++){

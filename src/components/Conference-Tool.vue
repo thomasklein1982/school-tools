@@ -8,6 +8,7 @@
         />
       </template>
       <template v-else>
+        <div class="flex-container-row" style="justify-content: flex-end"><Button @click="$emit('close')" icon="pi pi-times" text rounded/></div>
         Laden Sie bitte zunächst die exportierten Schüler-Daten (Excel) hoch:
         <div>
           <Button @click="upload" label="Hochladen" icon="pi pi-upload" :loading="uploadInProgress"/>
@@ -67,7 +68,7 @@ import Klassenliste from './Klassenliste.vue';
           this.klassen=null;
         }
         this.uploadInProgress=false;
-        
+        window.klassen=this.klassen;
       }
     }
   };
