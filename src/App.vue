@@ -22,9 +22,14 @@ import ConferenceTool from './components/Conference-Tool.vue';
 export default {
   data(){
     return {
-      version: "1.1",
-      current: 'start'
+      version: "1.3",
+      current: 'start',
+      zoomStyle: document.createElement("style")
     }
+  },
+  mounted(){
+    this.zoomStyle.size=1;
+    document.getElementsByTagName("head")[0].appendChild( this.zoomStyle );
   },
   components: {
     Startscreen, ConferenceTool

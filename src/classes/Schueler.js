@@ -18,6 +18,9 @@ export default class Schueler{
     return this.klasse.istOberstufe();
   }
   static getSubFachData(data,index){
+    if(data===null || data===undefined){
+      return [""];
+    }
     let split=data.split("-------");
     if(index===undefined){
       return split;
@@ -27,6 +30,16 @@ export default class Schueler{
     }else{
       return split[0];
     }
+  }
+  getFach(fachname){
+    let faecher=[];
+    for(let i=0;i<this.faecher.length;i++){
+      let f=this.faecher[i];
+      if(f.name===fachname){
+        faecher.push(f);
+      }
+    }
+    return faecher;
   }
   getNote(fachname){
     let note=[];
@@ -91,6 +104,27 @@ export default class Schueler{
       this.schnitt="-";
     }
   }
+  setKopfnoten(kopfnoten){
+    let av,sv;
+    av=this.getNote("AV")[0];
+    if(av) return false;
+    let key=this.klasse.name+"$"+this.nachname+"$"+this.vorname;
+    let data=kopfnoten[key];
+    if(data){
+      av=this.getFach("AV")[0];
+      av.setNote(data.av);
+      sv=this.getFach("SV")[0];
+      sv.setNote(data.sv);
+      console.log("AV/SV hinzugefuegt bei "+key);
+      return true;
+    }
+    return false;
+  }
+  addFach(fach){
+    fach=fach.getCopy();
+    fach.setNote("");
+    this.faecher.push(fach);
+  }
   parseFromExcel(reader,faecher){
     this.fehlzeiten=null;
     let data=reader.getCurrentCellContent();
@@ -111,7 +145,11 @@ export default class Schueler{
     pos=data.indexOf("-Fehlzeiten");
     if(pos>0){
       data=data.split("\n");
-      this.fehlzeiten=data[1].trim();
+      if(!data[1]){
+        this.fehlzeiten="0:0/0:0 ja";
+      }else{
+        this.fehlzeiten=data[1].trim();
+      }
     }
     this.faecher=[];
     if(!this.nichtAnwesend){

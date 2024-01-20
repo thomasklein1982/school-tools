@@ -1,8 +1,13 @@
 <template>
   <Dialog modal maximizable v-if="schueler" v-model:visible="visible" :header="header">
+    <template #header>
+      <div class="flex-container-row" style="align-items: center; width: 100%">
+        <strong class="flex zoom">{{ header }}</strong> <Zoom :style-node="$root.zoomStyle" css-selector=".zoom"/>
+      </div>
+    </template>
     <div class="flex-container-row">
       <template v-for="(liste,i) in fachlisten">
-        <DataTable showGridlines class="flex p-datatable-small" :value="liste" striped-rows>
+        <DataTable showGridlines class="flex p-datatable-small zoom" :value="liste" striped-rows>
           <Column field="name" header="Fach"/>
           <Column field="lehrkraft" header="Kürzel" style="text-align: center"/>
           <Column field="note" header="Note" style="text-align: center">
@@ -15,8 +20,8 @@
       </template>
     </div>
     <div class="statistics">
-      <Button @click="$refs.dialogSchuelerSchnitt.open(schueler)" link style="padding: 0" :label="'⌀ = '+schueler.schnitt"/>
-      <Button link style="padding: 0" :label="'Fehlzeiten = '+schueler.fehlzeiten"/>
+      <Button class="zoom" @click="$refs.dialogSchuelerSchnitt.open(schueler)" link style="padding: 0" :label="'⌀ = '+schueler.schnitt"/>
+      <Button class="zoom" link style="padding: 0" :label="'Fehlzeiten (T/S) = '+schueler.fehlzeiten"/>
     </div>
   </Dialog>
   <DialogSchuelerSchnitt ref="dialogSchuelerSchnitt"/>
@@ -27,10 +32,11 @@ import DataTable from "primevue/datatable";
 import Column from "primevue/column";
 import { splitArrayEvenly } from "../functions/helper";
 import DialogSchuelerSchnitt from "./DialogSchuelerSchnitt.vue";
+import Zoom from "./Zoom.vue";
 
 export default{
   components: {
-    DataTable, Column, DialogSchuelerSchnitt
+    DataTable, Column, DialogSchuelerSchnitt, Zoom
   },
   props: {
     

@@ -1,9 +1,13 @@
 <template>
   <div class="flex-container-row">
     <template v-for="(liste,i) in klassenlisten">
-      <DataTable class="p-datatable-small flex" :value="liste" striped-rows selectionMode="single" dataKey="name" :metaKeySelection="false"
+      <DataTable class="p-datatable-small flex zoom" :value="liste" striped-rows selectionMode="single" dataKey="name" :metaKeySelection="false"
         @rowSelect="onRowSelect">
-        <Column field="name" header="Klasse/Kurs"></Column>
+        <Column field="name" header="Klasse/Kurs">
+          <template #body="klasse">
+            <span :class="klasse.data.missesKopfnoten? 'warnung-kopfnoten':''">{{ klasse.data.name }}</span>
+          </template>
+        </Column>
         <Column field="klassenlehrkraft" header="Lehrkraft"></Column>
         <Column v-if="anzeigeSchnitt===0" field="schnitt" header="⌀" style="text-align: center"></Column>
         <Column v-else :header="anzeigeSchnitt" style="text-align: center">

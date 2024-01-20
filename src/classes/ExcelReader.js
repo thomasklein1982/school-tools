@@ -3,6 +3,8 @@ export class ExcelReader{
     this.rows=rows;
     this.currentRow=0;
     this.currentCol=0;
+    this.saveStates={};
+    this.updateValue();
   }
   getCurrentCellContent(){
     if(this.currentRow>=this.rows.length) return null;
@@ -15,19 +17,52 @@ export class ExcelReader{
       return c.trim();
     }
   }
+  updateValue(){
+    this.value=this.getCurrentCellContent();
+  }
+  saveColum(name){
+    this.saveStates[name]={
+      col: this.currentCol
+    };
+  }
+  saveRow(name){
+    this.saveStates[name]={
+      row: this.currentRow
+    };
+  }
+  saveCell(name){
+    this.saveStates[name]={
+      row: this.currentRow,
+      col: this.currentCol
+    };
+  }
+  goto(name){
+    let v=this.saveStates[name];
+    if(!v) return;
+    if(v.row!==undefined) this.currentRow=v.row;
+    if(v.col!==undefined) this.currentCol=v.col;
+    this.updateValue();
+    return this.value;
+  }
   move(dx,dy){
     this.currentRow+=dy;
     this.currentCol+=dx;
-    return this.getCurrentCellContent();
+    this.updateValue();
+    return this.value;
+  }
+  moveDown(){
+    return this.move(0,1);
   }
   /**gehe ganz nach links an den Anfang der aktuellen Zeile */
   gotoLeft(){
     this.currentCol=0;
+    this.updateValue();
   }
   /** 
    * gehe ganz nach oben in der aktuellen Spalte */
   gotoTop(){
     this.currentRow=0;
+    this.updateValue();
   }
   /**
    * gehe nach ganz links oben (Zelle A1)
@@ -35,6 +70,7 @@ export class ExcelReader{
   gotoTopLeft(){
     this.gotoLeft();
     this.gotoTop();
+    this.updateValue();
   }
   /**
    * Geht zur nächsten Zelle, die dem Suchwort entspricht. Bleibt an aktueller Position, falls nichts gefunden wird.
@@ -49,29 +85,31 @@ export class ExcelReader{
     let useRegex=search.substring!==undefined;
     let searching=true;
     while(searching){
+      this.updateValue();
+      if(this.value===null){
+        this.currentRow=startRow;
+        this.currentCol=startCol;
+        this.updateValue();
+        return false;
+      }
+      if(useRegex){
+        if(this.value.match(search)){
+          return true;
+        }
+      }else{
+        if(this.value.startsWith(search)){
+          return true;
+        }
+      }
       if(goRight){
         this.currentCol++;
       }else{
         this.currentRow++;
       }
-      let content=this.getCurrentCellContent();
-      if(content===null){
-        this.currentRow=startRow;
-        this.currentCol=startCol;
-        return false;
-      }
-      if(useRegex){
-        if(content.match(search)){
-          return true;
-        }
-      }else{
-        if(content.startsWith(search)){
-          return true;
-        }
-      }
     }
     this.currentRow=startRow;
     this.currentCol=startCol;
+    this.updateValue();
     return false;
   }
 

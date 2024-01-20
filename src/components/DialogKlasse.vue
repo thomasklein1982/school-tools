@@ -1,9 +1,14 @@
 <template>
   <Dialog modal maximizable v-if="klasse" v-model:visible="visible" :header="klasse.name+' ('+klasse.klassenlehrkraft+')'">
+    <template #header>
+      <div class="flex-container-row" style="align-items: center; width: 100%">
+        <strong class="flex">{{ klasse.name }} ({{ klasse.klassenlehrkraft }})</strong> <Zoom :style-node="$root.zoomStyle" css-selector=".zoom"/>
+      </div>
+    </template>
     <div class="flex-container-row">
       <template v-for="(liste,i) in schuelerlisten">
         <DataTable show-gridlines selectionMode="single" dataKey="id" :metaKeySelection="false"
-        @rowSelect="onRowSelect" class="flex p-datatable-small" :value="liste" striped-rows>
+        @rowSelect="onRowSelect" class="flex p-datatable-small zoom" :value="liste" striped-rows>
           <Column header="Name">
             <template #body="schueler">
               <span :class="schueler.data.zeigeWarnung? 'warnung-note':''">{{ schueler.data.anzeigeName }}</span>
@@ -36,12 +41,14 @@ import MultiSelect from "primevue/multiselect";
 import Column from "primevue/column";
 import DialogSchuelerSchnitt from "./DialogSchuelerSchnitt.vue";
 import { splitArrayEvenly } from "../functions/helper";
+import Zoom from "./Zoom.vue";
+
 export default{
   components: {
-    DataTable, Column, DialogSchuelerSchnitt, MultiSelect
+    DataTable, Column, DialogSchuelerSchnitt, MultiSelect, Zoom
   },
   props: {
-    
+    styleNode: Object
   },
   computed: {
     angezeigteFaecher(){
@@ -52,6 +59,9 @@ export default{
         if(f===0){
           this.zeigeSchnitt=true;
           continue;
+        }
+        if(f===1){
+          faecher.push("AV","SV");
         }
         if(f.faecher){
           faecher=faecher.concat(f.faecher);
@@ -105,15 +115,13 @@ export default{
         this.optionsFaecher.pop();
       }
       this.optionsFaecher.push({
-        text: "Durchschnitt",
+        text: "Schnitt",
         value: 0
       });
       if(!this.klasse.oberstufe){
         this.optionsFaecher.push({
           text: "Kopfnoten",
-          value: {
-            faecher: ["AV","SV"]
-          }
+          value: 1
         });
       }
       let faecher=this.klasse.getPflichtFaecher(false);
@@ -129,7 +137,7 @@ export default{
       }
       this.visible=true;
       if(this.anzeigeFaecher.length===0){
-        this.anzeigeFaecher.push(0);
+        this.anzeigeFaecher.push(0,1);
       }
     }
   }

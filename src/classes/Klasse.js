@@ -13,6 +13,7 @@ export default class Klasse{
     this.arbeitsverhalten=null;
     this.sozialverhalten=null;
     this.schnitt=null;
+    this.missesKopfnoten=true;
   }
   istOberstufe(){
     return this.oberstufe;
@@ -59,7 +60,32 @@ export default class Klasse{
     }
     return fach;
   }
+  assureKopfnotenInFaecher(fachname){
+    if(this.istOberstufe()){
+      this.missesKopfnoten=false;
+      return;
+    }
+    if(!this.missesKopfnoten) return;
+    if(!fachname){
+      this.assureKopfnotenInFaecher("AV");
+      this.assureKopfnotenInFaecher("SV");
+      return;
+    }
+    for(let i=0;i<this.faecher.length;i++){
+      let f=this.faecher[i];
+      if(f.name===fachname){
+        return;
+      }
+    }
+    let f=new Fach(fachname);
+    this.faecher.push(f);
+    for(let i=0;i<this.schueler.length;i++){
+      let s=this.schueler[i];
+      s.addFach(f);
+    }
+  }
   calculateData(){
+    this.assureKopfnotenInFaecher();
     let sum=0;
     let anz=0;
     let faecherMitNoten={};
@@ -105,6 +131,18 @@ export default class Klasse{
     let nach=s[0];
     let vor=s[1].trim().split(" ")[0];
     this.klassenlehrkraft=nach+", "+vor;
+  }
+  setKopfnoten(kopfnoten){
+    if(!this.missesKopfnoten) return;
+    let hinzuGefuegt=false;
+    for(let i=0;i<this.schueler.length;i++){
+      let s=this.schueler[i];
+      if(s.setKopfnoten(kopfnoten)){
+        hinzuGefuegt=true;
+      }
+    }
+    if(hinzuGefuegt) this.missesKopfnoten=false;
+    this.calculateData();
   }
   parseFromExcel(excelSheet){
     this.schueler=[];
