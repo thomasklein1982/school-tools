@@ -8,16 +8,24 @@
     <div class="flex-container-row">
       <template v-for="(liste,i) in schuelerlisten">
         <DataTable show-gridlines selectionMode="single" dataKey="id" :metaKeySelection="false"
-        @rowSelect="onRowSelect" class="flex p-datatable-small zoom" :value="liste" striped-rows>
+        @rowSelect="onRowSelect" class="klassentabelle flex p-datatable-small zoom" :value="liste" striped-rows>
           <Column header="Name">
             <template #body="schueler">
               <span :class="schueler.data.zeigeWarnung? 'warnung-note':''">{{ schueler.data.anzeigeName }}</span>
             </template>
           </Column>
-          <Column v-for="(f,i) in angezeigteFaecher" :header="f" style="text-align: center">
+          <Column v-for="(f,i) in angezeigteFaecher" :header="f.zeigeName? '':f" style="text-align: center">
             <template #body="schueler">
-              {{ schueler.data.getNote(f).join("|") }}
+              <template v-if="f.zeigeName">
+                {{ schueler.data.anzeigeNameKurz }}
+              </template>
+              <template v-else>
+                {{ schueler.data.getNote(f).join("|") }}
+              </template>
             </template>
+          </Column>
+          <Column v-if="zeigeFehlzeiten" field="fehlzeitenDisplay" style="text-align: center">
+            <template #header><span class="pi pi-clock"/></template>
           </Column>
           <Column v-if="zeigeSchnitt" field="schnitt" header="⌀" style="text-align: center"/>
         </DataTable>
@@ -54,14 +62,20 @@ export default{
     angezeigteFaecher(){
       let faecher=[];
       this.zeigeSchnitt=false;
+      this.zeigeFehlzeiten=false;
       for (let i = 0; i < this.anzeigeFaecher.length; i++) {
         let f = this.anzeigeFaecher[i];
         if(f===0){
           this.zeigeSchnitt=true;
           continue;
         }
+        if(f===2){
+          this.zeigeFehlzeiten=true;
+          continue;
+        }
         if(f===1){
           faecher.push("AV","SV");
+          continue;
         }
         if(f.faecher){
           faecher=faecher.concat(f.faecher);
@@ -69,22 +83,11 @@ export default{
           faecher.push(f);
         }
       }
+      // if(faecher.length>4){
+      //   let m=Math.ceil(faecher.length/2);
+      //   faecher.splice(m,0,{zeigeName: true});
+      // }
       return faecher;
-      // console.log("faecher",this.anzeigeFaecher);
-      // if(this.anzeigeFaecher===0){
-      //   return [];
-      // }
-      // if(this.anzeigeFaecher===1){
-      //   return ["AV","SV"];
-      // }
-      // if(this.anzeigeFaecher===2){
-      //   let faecher=this.klasse.getPflichtFaecher(false);
-      //   for(let i=0;i<faecher.length;i++){
-      //     faecher[i]=faecher[i].name;
-      //   }
-      //   return faecher;
-      // }
-      // return [this.anzeigeFaecher];
     },
     schuelerlisten(){
       let listen=splitArrayEvenly(this.klasse.schueler,this.columns);
@@ -101,7 +104,8 @@ export default{
       columns: 2,
       anzeigeFaecher: [],
       optionsFaecher: [],
-      zeigeSchnitt: true
+      zeigeSchnitt: true,
+      zeigeFehlzeiten: true
     }
   },
   emits: ["schueler"],
@@ -124,6 +128,10 @@ export default{
           value: 1
         });
       }
+      this.optionsFaecher.push({
+        text: "Fehlzeiten",
+        value: 2
+      });
       let faecher=this.klasse.getPflichtFaecher(false);
       let names={};
       for(let i=0;i<faecher.length;i++){
@@ -137,7 +145,12 @@ export default{
       }
       this.visible=true;
       if(this.anzeigeFaecher.length===0){
-        this.anzeigeFaecher.push(0,1);
+        this.anzeigeFaecher.push(0);
+        if(this.klasse.istOberstufe()){
+          this.anzeigeFaecher.push(2);
+        }else{
+          this.anzeigeFaecher.push(1);
+        }
       }
     }
   }

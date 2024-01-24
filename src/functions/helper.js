@@ -192,3 +192,15 @@ export function splitArrayEvenly(array,arrayCount){
   }
   return listen;
 }
+
+export function random(min,max){
+  return Math.floor(Math.random()*(max-min+1))+min;
+};
+
+export function randomFrom(array){
+  return array[random(0,array.length-1)];
+}
+
+export const vornamen=["Alan","Berta","Caesar","Daniela","Emma","Felicitas","Gustav","Hannah","Ida","Johannes","Konrad","Lea","Magnus","Nora","Oli","Petra","Quentin","Sandra","Thomas","Uwe","Valerie","Walpurga","Xaver","Yvy", "Zora"];
+
+export const nachnamen=["Klein","Groß","Mittel","Lang","Breit","Kurz","Schmal","Hoch","Weit","Berg","Tal","Schnee","Test123","Riesig","Alle","Computer","Notebook","Handy","Tablet"];

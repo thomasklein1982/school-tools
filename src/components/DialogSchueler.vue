@@ -8,11 +8,19 @@
     <div class="flex-container-row">
       <template v-for="(liste,i) in fachlisten">
         <DataTable showGridlines class="flex p-datatable-small zoom" :value="liste" striped-rows>
-          <Column field="name" header="Fach"/>
-          <Column field="lehrkraft" header="Kürzel" style="text-align: center"/>
+          <Column field="name" header="Fach">
+            <template #body="fach">
+              <span :class="fach.data.istHauptfach? 'hauptfach':''">{{fach.data.name}}</span>
+            </template>
+          </Column>
+          <Column field="lehrkraft" header="Kürzel" style="text-align: center">
+            <template #body="fach">
+              <span :class="fach.data.istHauptfach? 'hauptfach-lehrkraft':''">{{fach.data.lehrkraft}}</span>
+            </template>
+          </Column>
           <Column field="note" header="Note" style="text-align: center">
             <template #body="fach">
-              <span :class="fach.data.zeigeWarnung(schueler.istOberstufe())? 'warnung-note':''">{{ fach.data.note }}</span>
+              <span :class="(fach.data.istHauptfach? 'hauptfach-note':'')+' '+(fach.data.zeigeWarnung(schueler.istOberstufe())? 'warnung-note':'')">{{ fach.data.note }}</span>
             </template>
           </Column>
         </DataTable>

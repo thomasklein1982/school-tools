@@ -22,7 +22,7 @@ import ConferenceTool from './components/Conference-Tool.vue';
 export default {
   data(){
     return {
-      version: "1.3",
+      version: "1.6",
       current: 'start',
       zoomStyle: document.createElement("style")
     }

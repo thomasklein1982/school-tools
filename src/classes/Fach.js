@@ -1,20 +1,24 @@
+import { random, randomFrom } from "../functions/helper";
+
 export default class Fach{
-  constructor(name, lehrkraft){
+  constructor(name, lehrkraft, oberstufe){
     this.name=name;
+    this.oberstufe=oberstufe;
     this.lehrkraft=lehrkraft;
-    this.istHauptfach=(name==="D" || name==="E" || name==="M" || name==="F" || name==="L" || name==="SPA");
+    this.hauptfach=false;
     this.fehlzeiten=null;
     this.note=-1;
     this.realNote=-1;
     this.art=null;
     this.epochal=false;
     this.schnitt=null;
+    this.istHauptfach=false;
   }
   istKopfnote(){
     return (this.name==="AV"||this.name==="SV");
   }
   getCopy(){
-    return new Fach(this.name,this.lehrkraft);
+    return new Fach(this.name,this.lehrkraft,this.oberstufe);
   }
   istPflichtfach(){
     return this.art==="P";
@@ -54,6 +58,11 @@ export default class Fach{
   }
   setArt(art){
     this.art=art;
+    if(this.oberstufe){
+      this.istHauptfach=this.art==="L";
+    }else{
+      this.istHauptfach=this.art==="P" && (this.name==="D" || this.name==="E" || this.name==="M" || this.name==="F" || this.name==="L" || this.name==="SPA");
+    }
   }
   setFehlzeiten(fehlzeiten){
     this.fehlzeiten=fehlzeiten;
@@ -76,5 +85,19 @@ export default class Fach{
   setLehrkraft(data){
     data=data.trim();
     this.lehrkraft=data? data:null;
+  }
+  pseudonomize(){
+    let letters=["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
+    let k="";
+    let len=random(2,3);
+    for(let i=0;i<len;i++){
+      k+=randomFrom(letters);
+    }
+    this.lehrkraft=k;
+  }
+  fromData(data){
+    for(let a in data){
+      this[a]=data[a];
+    }
   }
 }

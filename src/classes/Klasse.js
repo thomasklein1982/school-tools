@@ -1,3 +1,4 @@
+import { randomFrom, random, nachnamen, vornamen } from "../functions/helper";
 import { ExcelReader } from "./ExcelReader";
 import Fach from "./Fach";
 import Schueler from "./Schueler";
@@ -74,6 +75,7 @@ export default class Klasse{
     for(let i=0;i<this.faecher.length;i++){
       let f=this.faecher[i];
       if(f.name===fachname){
+        this.missesKopfnoten=false;
         return;
       }
     }
@@ -161,11 +163,11 @@ export default class Klasse{
     data=reader.move(1,1);
     //Faecher lesen:
     while(data!==null){
-      if(data.startsWith("Wdh")){
+      if(data.startsWith("Wdh")||this.istOberstufe() && data==="AV"){
         break;
       }else{
         let s=data.split("\n");
-        let fach=new Fach(s[0]?.trim(),s[1]?.trim());
+        let fach=new Fach(s[0]?.trim(),s[1]?.trim(),this.istOberstufe());
         this.faecher.push(fach);
       }
       data=reader.move(1,0);
@@ -181,5 +183,58 @@ export default class Klasse{
       this.schueler.push(schueler);
     }
     this.calculateData();
+  }
+  pseudonomize(klassen){
+    //name tauschen:
+    let k=randomFrom(klassen);
+    let name=this.name;
+    this.name=k.name;
+    k.name=name;
+    for(let i=0;i<this.faecher.length;i++){
+      this.faecher[i].pseudonomize();
+    }
+    this.klassenlehrkraft=randomFrom(nachnamen)+", "+randomFrom(vornamen);
+    //schueler tauschen:
+    for(let i=0;i<this.schueler.length;i++){
+      let s=this.schueler[i];
+      s.pseudonomize();
+    }
+  }
+  exchangeStudents(klassen){
+    //schueler tauschen:
+    for(let i=0;i<this.schueler.length;i++){
+      let s=this.schueler[i];
+      let k=randomFrom(klassen);
+      let j=random(0,k.schueler.length-1);
+      this.schueler[i]=k.schueler[j];
+      k.schueler[j]=s;
+    }
+  }
+  sortStudents(){
+    this.schueler.sort((a,b)=>{
+      if(a.anzeigeName<=b.anzeigeName){
+        return -1;
+      }else{
+        return 1;
+      }
+    });
+  }
+  fromData(data){
+    this.name=data.name;
+    this.klassenlehrkraft=data.klassenlehrkraft;
+    this.schueler=[];
+    this.oberstufe=data.oberstufe;
+    this.faecher=[];
+    this.missesKopfnoten=data.missesKopfnoten;
+    for(let i=0;i<data.faecher.length;i++){
+      let f=data.faecher[i];
+      let fach=new Fach(f.name,f.lehrkraft,f.oberstufe);
+      fach.fromData(f);
+    }
+    for(let i=0;i<data.schueler.length;i++){
+      let d=data.schueler[i];
+      let s=new Schueler(d.id,this);
+      s.fromData(d);
+    }
   }
 }

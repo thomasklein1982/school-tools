@@ -1,3 +1,6 @@
+import { nachnamen, randomFrom, vornamen } from "../functions/helper";
+import Fach from "./Fach";
+
 export default class Schueler{
   constructor(id,klasse){
     this.id=id;
@@ -13,6 +16,7 @@ export default class Schueler{
     this.schnitt=null;
     this.schnittInfos=null;
     this.zeigeWarnung=false;
+    this.fehlzeitenDisplay="";
   }
   istOberstufe(){
     return this.klasse.istOberstufe();
@@ -76,6 +80,7 @@ export default class Schueler{
   }
   calculateData(){
     this.anzeigeName=this.nachname+", "+this.vorname.split(" ")[0];
+    this.anzeigeNameKurz=this.nachname.substring(0,2);
     if(this.nichtAnwesend){
       this.anzeigeName="("+this.anzeigeName+")";
     }
@@ -102,6 +107,25 @@ export default class Schueler{
       this.schnitt=(infos.sum/infos.anz).toFixed(1);
     }else{
       this.schnitt="-";
+    }
+    if(this.fehlzeiten){
+      let fz=this.fehlzeiten.split(" ")[0];
+      fz=fz.split("/");
+      let tage=fz[0].split(":");
+      let stunden=fz[1].split(":");
+      if(tage[1]!=="0" && tage[1]!=="-"){
+        tage=tage[0]+"("+tage[1]+")/";
+      }else if(tage[0]==="-"){
+        tage="";
+      }else{
+        tage=tage[0]+"/";
+      }
+      if(stunden[1]!=="0" && stunden[1]!=="-"){
+        stunden=stunden[0]+"("+stunden[1]+")";
+      }else{
+        stunden=stunden[0];
+      }
+      this.fehlzeitenDisplay=tage+stunden;
     }
   }
   setKopfnoten(kopfnoten){
@@ -183,6 +207,25 @@ export default class Schueler{
       return reader.move(0,2);
     }else{
       return reader.move(0,5);
+    }
+  }
+  pseudonomize(){
+    this.vorname=randomFrom(vornamen);
+    this.nachname=randomFrom(nachnamen);
+    for(let i=0;i<this.faecher.length;i++){
+      this.faecher[i].pseudonomize();
+    }
+    this.calculateData();
+  }
+  fromData(data){
+    for(let a in data){
+      this[a]=data[a];
+    }
+    this.faecher=[];
+    for(let i=0;i<data.faecher.length;i++){
+      let f=data.faecher[i];
+      let fach=new Fach(f.name,f.lehrkraft,f.oberstufe);
+      fach.fromData(f);
     }
   }
 }

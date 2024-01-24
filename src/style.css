@@ -25,6 +25,24 @@ html,body{
   overflow: auto;
 }
 
+.hauptfach{
+  font-weight: 800;
+  font-style: italic;
+}
+.hauptfach::after{
+  content: "*";
+}
+
+.hauptfach-lehrkraft{
+  font-weight: 800;
+  font-style: italic;
+}
+
+.hauptfach-note{
+  font-weight: 800;
+  font-style: italic;
+}
+
 .content{
   flex: 1;
   overflow-y: auto;
@@ -32,6 +50,18 @@ html,body{
 }
 .warnung-note{
   color: red;
+}
+.klassentabelle .p-datatable-tbody > tr:nth-child(even) {
+  background: #354154;
+}
+.klassentabelle * > tr>*:nth-child(even) {
+  background: #354154;
+  /*color: yellow;*/
+  /*border-right: 2pt solid white;
+  border-left: 2pt solid white;*/
+}
+.klassentabelle * > tr:nth-child(even)>*:nth-child(even) {
+  background: #657184;
 }
 .warnung-note::after{
   display: inline-block;

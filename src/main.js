@@ -34,6 +34,8 @@ import TextArea from 'primevue/textarea';
 import Tooltip from 'primevue/tooltip';
 import App from './App.vue'
 import { registerSW } from 'virtual:pwa-register'
+import { download, upload } from './functions/helper';
+import Klasse from './classes/Klasse';
 
 const updateSW=registerSW({
   onNeedRefresh(){
@@ -79,3 +81,42 @@ app.component('Listbox',Listbox);
 app.component('TextArea',TextArea);
 
 app.mount('#app');
+
+window.pseudonomisiereDaten=function(){
+  if(!window.klassen) return;
+  let klassen=window.klassen;
+  for(let i=0;i<klassen.length;i++){
+    klassen[i].pseudonomize(klassen);
+  }
+  for(let i=0;i<klassen.length;i++){
+    klassen[i].exchangeStudents(klassen);
+  }
+  for(let i=0;i<klassen.length;i++){
+    klassen[i].sortStudents();
+  }
+  for(let i=0;i<klassen.length;i++){
+    klassen[i].calculateData();
+  }
+  klassen.sort((a,b)=>{
+    if(a.name<=b.name){
+      return -1;
+    }else{
+      return 1;
+    }
+  });
+};
+
+window.downloadKlassen=function(){
+  download(JSON.stringify(window.klassen),"Zeugniskonferenzliste.txt");
+}
+
+window.uploadKlassen=async function(){
+  let data=await upload();
+  data=JSON.parse(data);
+  let klassen=[];
+  for(let i=0;i<data.length;i++){
+    let k=data[i];
+    let kl=new Klasse(k.name);
+    kl.fromData(k);
+  }
+}
