@@ -152,10 +152,10 @@ export default class Schueler{
   parseFromExcel(reader,faecher){
     this.fehlzeiten=null;
     let data=reader.getCurrentCellContent();
-    let pos=data.indexOf("-FachLehrer");
+    let pos=data.toLowerCase().indexOf("-fachlehr");
     let nichtAnwesend=false;
     if(pos<0){
-      pos=data.indexOf("-Fehlzeiten");
+      pos=data.toLowerCase().indexOf("-fehlzeiten");
       this.nichtAnwesend=true;
     }
     let name=data.substring(0,pos).split(",");
@@ -166,7 +166,7 @@ export default class Schueler{
       data=reader.move(0,1);
       reader.move(0,-1);
     }
-    pos=data.indexOf("-Fehlzeiten");
+    pos=data.toLowerCase().indexOf("-fehlzeiten");
     if(pos>0){
       data=data.split("\n");
       if(!data[1]){
