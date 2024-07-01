@@ -152,6 +152,7 @@ export default class Schueler{
   parseFromExcel(reader,faecher){
     this.fehlzeiten=null;
     let data=reader.getCurrentCellContent();
+    console.log("parseFromExcel",data);
     let pos=data.toLowerCase().indexOf("-fachlehr");
     let nichtAnwesend=false;
     if(pos<0){
@@ -169,7 +170,7 @@ export default class Schueler{
     pos=data.toLowerCase().indexOf("-fehlzeiten");
     if(pos>0){
       data=data.split("\n");
-      if(!data[1]){
+      if(!data[1]||data[1].indexOf("/")<0){ /**ist das ein Fehler? Hier stand einmal nur "ja" */
         this.fehlzeiten="0:0/0:0 ja";
       }else{
         this.fehlzeiten=data[1].trim();
