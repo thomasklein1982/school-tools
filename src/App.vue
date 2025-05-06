@@ -18,12 +18,13 @@
 <script>
 import Startscreen from './components/startscreen.vue';
 import ConferenceTool from './components/Conference-Tool.vue';
+import packageJson from '../package.json';
 
 export default {
   data(){
     return {
-      version: "1.8",
-      current: 'start',
+      version: packageJson.version,
+      current: 'conference',
       zoomStyle: document.createElement("style")
     }
   },

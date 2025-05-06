@@ -111,3 +111,7 @@ html,body{
 .p-datatable .p-column-header-content{
   display: block;
 }
+
+a{
+  color: orange;
+}

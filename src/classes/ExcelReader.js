@@ -14,7 +14,11 @@ export class ExcelReader{
     if(!c){
       return "";
     }else{
-      return c.trim();
+      if(c.trim){
+        return c.trim();
+      }else{
+        return c+"";
+      }
     }
   }
   updateValue(){

@@ -133,6 +133,7 @@ export default class Klasse{
     let nach=s[0];
     let vor=s[1].trim().split(" ")[0];
     this.klassenlehrkraft=nach+", "+vor;
+    this.klassenlehrkraftVollerName=fullnameString;
   }
   setKopfnoten(kopfnoten){
     if(!this.missesKopfnoten) return;
